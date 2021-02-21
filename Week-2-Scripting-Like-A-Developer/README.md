@@ -17,11 +17,11 @@ Things I needed to install for these labs:
 
 ### Azure & PowerShell
 
-| Name                     | Installation Method    | Install Command                                                |
-| ------------------------ | ---------------------- | -------------------------------------------------------------- |
-| Powershell-core (PS 7.1) | Chocolatey             | `choco install powershell-core`                                |
-| PS-Module Az             | PIP (Python Installer) | `Install-Module -Name Az -AllowClobber -Scope AllUsers`        |
-| PSScriptAnalyzer         | PIP (Python Installer) | `Install-Module PSScriptAnalyzer -Force -Repository PSGallery` |
+| Name                     | Installation Method           | Install Command                                                |
+| ------------------------ | ----------------------------- | -------------------------------------------------------------- |
+| Powershell-core (PS 7.1) | Chocolatey                    | `choco install powershell-core`                                |
+| PS-Module Az             | PowerShell (Module Installer) | `Install-Module -Name Az -AllowClobber -Scope AllUsers`        |
+| PSScriptAnalyzer         | PowerShell (Module Installer) | `Install-Module PSScriptAnalyzer -Force -Repository PSGallery` |
 
 ## PowerShell Code
 
