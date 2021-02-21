@@ -8,16 +8,16 @@ Things I needed to install for these labs:
 
 ### AWS & Python
 
-AWS-CLI - [Download here](https://aws.amazon.com/cli/)
-Python3 - `choco install python`
-Boto3 - `pip install boto3`
-Pylint - `pip install pylint`
+- AWS-CLI - [Download here](https://aws.amazon.com/cli/)
+- Python3 - `choco install python`
+- Boto3 - `pip install boto3`
+- Pylint - `pip install pylint`
 
 ### Azure & PowerShell
 
-Powershell-core (PS 7.1) - `choco install powershell-core`
-PS-Module Az (Had to remove AzureRM because they are not compatible) - `Install-Module -Name Az -AllowClobber -Scope AllUsers`
-PSScriptAnalyzer - `Install-Module PSScriptAnalyzer -Force -Repository PSGallery`
+- Powershell-core (PS 7.1) - `choco install powershell-core`
+- PS-Module Az (Had to remove AzureRM because they are not compatible) - `Install-Module -Name Az -AllowClobber -Scope AllUsers`
+- PSScriptAnalyzer - `Install-Module PSScriptAnalyzer -Force -Repository PSGallery`
 
 ## PowerShell Code
 
