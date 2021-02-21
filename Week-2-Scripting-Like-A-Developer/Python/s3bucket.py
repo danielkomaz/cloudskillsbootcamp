@@ -1,5 +1,5 @@
-import boto3
 import sys
+import boto3
 
 try:
     def main():
@@ -15,7 +15,7 @@ def create_s3bucket(bucket_name):
     )
 
     # Had to add location and region because of set default region
-    # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-example-creating-buckets.html    
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-example-creating-buckets.html
     location = {'LocationConstraint':'eu-west-2'}
 
     bucket = s3_bucket.create_bucket(
