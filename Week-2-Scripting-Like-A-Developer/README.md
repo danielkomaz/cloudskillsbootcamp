@@ -1,6 +1,6 @@
-# Week 2 Scripting Like A Developer
+# Week 2 - Scripting Like A Developer
 
-The code found in this repositore is to help you learn how to script like a Developer.
+The code found in this repository is to help you learn how to script like a Developer.
 
 ## Prepare Your DEV Environment
 
