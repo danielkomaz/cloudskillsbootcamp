@@ -1,0 +1,179 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminPassword": {
+      "type": "string",
+      "metadata": {
+        "description": "description"
+      }
+    }
+  },
+  "functions": [],
+  "variables": {},
+  "resources": [
+    {
+      "name": "[toLower('dkcsdevopsstorage')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2019-06-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "dkcsdevops Storage Account"
+      },
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage"
+    },
+    {
+      "name": "dkcsdevops-PublicIP",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2019-11-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "PublicIPAddress"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[toLower('dkcsdevops')]"
+        }
+      }
+    },
+    {
+      "name": "dkcsdevops-nsg",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2018-08-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "nsgRule1",
+            "properties": {
+              "description": "description",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "dkcsdevops-VirtualNetwork",
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2019-11-01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'dkcsdevops-nsg')]"
+      ],
+      "tags": {
+        "displayName": "dkcsdevops-VirtualNetwork"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": ["10.0.0.0/16"]
+        },
+        "subnets": [
+          {
+            "name": "dkcsdevops-VirtualNetwork-Subnet",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'dkcsdevops-nsg')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "dkcsdevops-NetworkInterface",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2019-11-01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'dkcsdevops-PublicIP')]",
+        "[resourceId('Microsoft.Network/virtualNetworks', 'dkcsdevops-VirtualNetwork')]"
+      ],
+      "tags": {
+        "displayName": "dkcsdevops-NetworkInterface"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipConfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'dkcsdevops-PublicIP')]"
+              },
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'dkcsdevops-VirtualNetwork', 'dkcsdevops-VirtualNetwork-Subnet')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "dkcsdevops",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2019-07-01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', 'dkcsdevops-NetworkInterface')]"
+      ],
+      "tags": {
+        "displayName": "dkcsdevops"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_A2_v2"
+        },
+        "osProfile": {
+          "computerName": "dkcsdevops",
+          "adminUsername": "adminUsername",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "16.04-LTS",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "dkcsdevops-OSDisk",
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'dkcsdevops-NetworkInterface')]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', toLower('dkcsdevopsstorage'))).primaryEndpoints.blob]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "publicIP": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses','dkcsdevops-PublicIP')).dnsSettings.fqdn]"
+    }
+  }
+}
