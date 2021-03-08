@@ -1,4 +1,4 @@
-# Week 3 - GitHub and Source Control
+# Week 4 - GitHub and Source Control
 
 A brief documentation about frequently used git commands.
 
@@ -290,6 +290,6 @@ git status -v
 
 ## Helpful Links
 
-https://git-scm.com/docs/gittutorial
+[Official Git Tutorial Site](https://git-scm.com/docs/gittutorial)
 
-https://www.atlassian.com/git/tutorials/learn-git-with-bitbucket-cloud
+[Git Tutorial by Atlassian](https://www.atlassian.com/git/tutorials/learn-git-with-bitbucket-cloud)
