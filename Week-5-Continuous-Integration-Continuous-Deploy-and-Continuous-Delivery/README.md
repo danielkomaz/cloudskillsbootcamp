@@ -323,4 +323,6 @@ The following oneliner will give you the http URL to clone your newly created re
 (aws codecommit get-repository --repository-name $repoName | ConvertFrom-Json).repositoryMetadata.cloneUrlHttp
 ```
 
+## Credits
+
 Cowritten by Kendra Rohrhofer
