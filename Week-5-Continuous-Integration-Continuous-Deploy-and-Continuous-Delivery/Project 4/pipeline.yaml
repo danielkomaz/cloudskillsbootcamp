@@ -1,0 +1,14 @@
+jobs:
+  - job: Job_1
+    displayName: Agent job 1
+    pool:
+      vmImage: vs2017-win2016
+    steps:
+      - checkout: self
+      - task: AzureCLI@2
+        displayName: "Azure CLI "
+        inputs:
+          connectedServiceNameARM: 0fbb9c9c-5885-4443-a90c-7ab733245e2c
+          scriptType: pscore
+          scriptLocation: inlineScript
+          inlineScript: az group create -l westeurope -n pipelinetest
