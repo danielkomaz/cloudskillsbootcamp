@@ -116,10 +116,9 @@ I also included the generated code of the function (named `cloudskillsiodk`) in 
 
 ### Software (Terraform Azure Web App)
 
-| Name      | Installation Method | Install Command                              |
-| --------- | ------------------- | -------------------------------------------- |
-| Terraform | Chocolatey          | `choco install terraform`                    |
-| AWS-CLI   | Download & Install  | [Download here](https://aws.amazon.com/cli/) |
+| Name      | Installation Method | Install Command           |
+| --------- | ------------------- | ------------------------- |
+| Terraform | Chocolatey          | `choco install terraform` |
 
 ### Helpful VSCode Plugins (Terraform Azure Web App)
 
@@ -163,3 +162,96 @@ I also included the generated code of the function (named `cloudskillsiodk`) in 
 6. Select your GitHub account, repository and branch (the forked demo app) to deploy from
 7. On the summary screen just click on `Finish` and wait for the app to be deployed
 8. Go back to Overview of the App Service where you can find the URL to open your newly published App
+
+## Project 3 - Deploy an Azure Web App via CICD in GitHub Actions
+
+### Software (Azure Web App)
+
+| Name                     | Installation Method           | Install Command                                         |
+| ------------------------ | ----------------------------- | ------------------------------------------------------- |
+| Powershell-core (PS 7.1) | Chocolatey                    | `choco install powershell-core`                         |
+| PS-Module Az             | PowerShell (Module Installer) | `Install-Module -Name Az -AllowClobber -Scope AllUsers` |
+
+### Create Azure Cedentials
+
+1. Define variables
+
+   ```PowerShell
+   $servicePrincipalName = "<YOUR_SERVICE_PRINCIPAL_NAME>"
+   $subscriptionId = "<YOUR_SUBSCRIPTION_ID>"
+   $resourceGroup = "<YOUR_RESOURCE_GROUP_NAME>"
+   $rgLocation = "<LOCATION_OF_YOUR_RG>"
+   ```
+
+2. (Optional) Create Resource Group
+
+   ```PowerShell
+   az group create -l $rgLocation -n $resourceGroup
+   ```
+
+3. Create Service Principal
+
+   ```PowerShell
+   az ad sp create-for-rbac --name $servicePrincipalName --role contributor --scopes /subscriptions/$subscriptionId/resourceGroups/$resourceGroup --sdk-auth
+   ```
+
+4. Copy the json output of the above command for later
+
+### Create Github Action
+
+1. Open [GitHub](https://github.com/)
+2. Fork repo `https://github.com/AdminTurnedDevOps/javascript-sdk-demo-app` into your account
+3. Open your newly forked repository
+4. Edit `javascript-sdk-demo-app/.github/workflows/main.yml` and change variables `RESOURCE_GROUP_NAME`, `APP_SERVICE_PLAN` and `APP_SERVICE`
+5. Commit your changes
+6. Click on `Actions`
+7. As we cloned the repo where the workflows already exist,
+   we only need to click on `I understand my workflows, go ahead and enable them`
+
+8. Now go to `Settings` -> `Secrets`
+9. Click on `New repository secret`
+10. Enter `AZURE_CREDENTIALS` into the `Name` field
+11. Enter the saved json output of your Service Principal into the `Value` field and save the secret
+12. Go back to `Actions`
+13. Select workflow `.github/workflows/main.yml` and click on `Run workflow`
+14. Open your newly deployed App Service in the Azure portal where you can find the URL to open your newly published App
+
+## Project 4 - Create a Lambda Funcion
+
+### Software (Lambda Funcion)
+
+| Name                     | Installation Method | Install Command                 |
+| ------------------------ | ------------------- | ------------------------------- |
+| Powershell-core (PS 7.1) | Chocolatey          | `choco install powershell-core` |
+| AWS-CLI                  | Chocolatey          | `choco install awscli`          |
+| NVM                      | Chocolatey          | `choco install nvm`             |
+| NPM                      | NVM                 | `nvm install latest`            |
+
+**Note:** Do not forget to enable nvm by running `nvm on`, else npm will not work.
+
+#### Helpful VSCode Plugins (Terraform)
+
+| Name | Identifier         | Short Description                                                                                                                          |
+| ---- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| YAML | redhat.vscode-yaml | Provides comprehensive YAML Language support to Visual Studio Code, via the yaml-language-server, with built-in Kubernetes syntax support. |
+
+### Installing Serverless
+
+1. Ensure that you have NPM install (package manager for JavaScript)
+2. Run `npm install -g serverless`
+3. Create a serverless template - `serverless create --template aws-python3`
+4. Update the `serverless.yml` to include the following line under `handler:` (Line 62)
+
+   ```YAML
+       events:
+         - http:
+             path: /
+             method: get
+   ```
+
+   This will allow you to reach the AWS Lambda function from a URL
+
+5. Run `serverless deploy`
+
+**Note:** Installation workflow copied from [Cloudsills Repository](https://github.com/CloudSkills/Cloud-Native-DevOps-Bootcamp/blob/main/Week%206%20-%20Serverless%20in%20Azure%20and%20AWS/Python-Lambda-Function/readme.md)  
+**Note 2:** Be aware that the created function will be deployed to `us-east-1` by default. If you want to change this, you need to uncomment and edit line 30 in `serverless.yml`
