@@ -14,3 +14,6 @@
 # go module files
 go.mod
 go.sum
+
+# include specific files
+!Week-6-Serverless-In-Azure-And-AWS/Project-2/Terraform/terraform.tfvars
