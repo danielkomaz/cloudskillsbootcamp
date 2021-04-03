@@ -268,7 +268,7 @@ This is a brief overview of said tools.
 The Security Center shows the health of your apps and also some recommendations based on best practices.
 For detailed information about the Security Center check the [official website](https://azure.microsoft.com/en-gb/services/security-center/#features).
 
-#### Authentication / Aothorization
+#### Authentication / Authorization
 
 Here you are able to configure several authentication mechanisms for your app if they receive unauthenticated requests.
 Authentication methods range from Azure Active Directory over Google to Twitter.
@@ -277,4 +277,37 @@ For more detailed information consult the [official documentation](https://docs.
 
 #### Identity
 
+There are 2 ways of handling identity in Azure:
+
+1. System assigned
+   A system assigned managed identity is restricted to one per resource and is tied to the lifecycle of this resource.  
+   With this you are able to restict the service account to identify a single resource.
+2. User assigned
+   User assigned managed identities enable Azure resources to authenticate to cloud services (e.g. Azure Key Vault) without storing credentials in code.
+
 For more detailed information consult the [official documentation](https://docs.microsoft.com/en-us/azure/app-service/overview-managed-identity?tabs=dotnet).
+
+### AWS
+
+#### Lamdba Function Permissions
+
+Security of Lambda functions are managed in the `Permissions` tab of the function itself.  
+Permission are based on execution roles.
+
+When editing permission you can add existing roles or create a new one based on a role template.  
+The function will then be executed in the context of this `execution role` instead of being run manually by your user.
+
+#### IAM
+
+You also have the option to create roles via IAM, where you have a more complete list of Lambda roles which you can base your new role on.
+
+For this follow these steps:
+
+1. Search for `IAM`
+2. Click on `Create role`
+3. Click on `Lambda`
+4. Click on `Next: Permissions`
+5. Filter the list for `Lamdba` and select your policies of choice
+6. Click on `Next: Tags`
+7. Click on `Next: Review`
+8. Give your role a name and click `Create role`
