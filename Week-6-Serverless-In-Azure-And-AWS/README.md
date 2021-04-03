@@ -255,3 +255,26 @@ I also included the generated code of the function (named `cloudskillsiodk`) in 
 
 **Note:** Installation workflow copied from [Cloudsills Repository](https://github.com/CloudSkills/Cloud-Native-DevOps-Bootcamp/blob/main/Week%206%20-%20Serverless%20in%20Azure%20and%20AWS/Python-Lambda-Function/readme.md)  
 **Note 2:** Be aware that the created function will be deployed to `us-east-1` by default. If you want to change this, you need to uncomment and edit line 30 in `serverless.yml`
+
+## Project 5 - Security for Serverless Apps
+
+Every cloud provider has several tools in place to ensure deployed Apps are kept secure.
+This is a brief overview of said tools.
+
+### Azure
+
+#### Security Center
+
+The Security Center shows the health of your apps and also some recommendations based on best practices.
+For detailed information about the Security Center check the [official website](https://azure.microsoft.com/en-gb/services/security-center/#features).
+
+#### Authentication / Aothorization
+
+Here you are able to configure several authentication mechanisms for your app if they receive unauthenticated requests.
+Authentication methods range from Azure Active Directory over Google to Twitter.
+
+For more detailed information consult the [official documentation](https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization).
+
+#### Identity
+
+For more detailed information consult the [official documentation](https://docs.microsoft.com/en-us/azure/app-service/overview-managed-identity?tabs=dotnet).
