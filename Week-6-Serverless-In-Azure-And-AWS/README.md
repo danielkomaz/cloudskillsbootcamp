@@ -311,3 +311,31 @@ For this follow these steps:
 6. Click on `Next: Tags`
 7. Click on `Next: Review`
 8. Give your role a name and click `Create role`
+
+## Project 6 - Monitoring Serverless Apps in Azure AWS
+
+### Azure Monitor
+
+#### Application Insight
+
+Insights provide a customized monitoring experience for particular Azure services. They use the same metrics and logs as other features in Azure Monitor but may collect additional data and provide a unique experience in the Azure portal.
+
+[Official Documentation](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview)
+
+#### Logs
+
+Azure Monitor Logs is built on top of Azure Data Explorer and all data is retrieved from a Log Analytics workspace using a log query written using Kusto Query Language (KQL). You can write your own queries or use solutions and insights that include log queries for a particular application or service.
+
+[Official Documentation](https://docs.microsoft.com/en-us/azure/azure-monitor/faq#logs)
+
+#### Diagnose and Solve Problems
+
+App Service diagnostics is an intelligent and interactive experience to help you troubleshoot your app with no configuration required. When you do run into issues withyour app, App Service diagnostics points out what’s wrong to guide you to the right information to more easily and quickly troubleshoot and resolve the issue.
+
+[Official Documentation](https://docs.microsoft.com/en-us/azure/app-service/overview-diagnostics)
+
+### AWS Cloudwatch
+
+Amazon CloudWatch provides a scalable and flexible monitoring solution.
+
+[Official Documentation](https://docs.aws.amazon.com/cloudwatch/)
