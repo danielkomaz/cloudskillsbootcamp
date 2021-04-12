@@ -131,3 +131,13 @@ If you click on one such vulnerbility you can see a discription about the issue 
 17. Open the GitHub repository in browser
 18. Click on `Actions`
 19. Open latest CI run where you can see that the issue has been solved and all checks passed
+
+## Project 3 - Security Authentication in Code
+
+For this Project we need to prepare the following Azure infrastructure:
+
+- VM with Windows Server 2019 Datacenter and public IP
+- Managed Service Identity bound to the VM
+- Azure Key Vault
+
+The directory `Project-3\Terraform` provides you with a terraform module to povide all these with a single `terraform apply`.
