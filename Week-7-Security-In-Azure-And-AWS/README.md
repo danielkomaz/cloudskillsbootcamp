@@ -141,3 +141,39 @@ For this Project we need to prepare the following Azure infrastructure:
 - Azure Key Vault
 
 The directory `Project-3\Terraform` provides you with a terraform module to povide all these with a single `terraform apply`.
+
+After deploying the infrastructure follow these steps:
+
+1. Open the [azure portal](https://portal.azure.com/)
+2. Go the the key vault resource
+3. Open the `Secrets` tab
+4. Click on `Generate/Import`
+5. Enter a `name` and some random `password`
+6. Click `Create`
+7. Open the `Access policies` tab
+8. Click on `+ Add Access Policy`
+9. Fill the form selecting the following:
+   - Secret permissions: Get, List
+   - Select principal: Search your vms name and click `Select`
+10. Click on `Add`
+11. Go Back to your resource group and click on your vm
+12. In the Overview of your VM click on `Identity`
+13. In tab `System assigned` the Status should already be set to `On` by our terraform deployment
+14. Click on `Azure role assignments`
+15. No click on `Add role assignment`
+16. In the new form select the following:
+
+    - Scope: `Key vault`
+    - Subscription: your Azure Subscription
+    - Resource: The secret created in steps 4-6
+    - Role: Reader
+
+17. Click `Save`
+18. Now go to `Connect` on your VM
+19. Check that `Public IP address` is selected and click on `Download RDP File`
+20. Save the file somwehere and open it after the download finished
+21. Enter `admin_username` and `admin_password` which you have specified in your `terraform.tfvars`
+22. Open Powershell ISE by clicking on `Start` -> click `Windows Powershell ISE`
+23. Run command: `Install-Module AZ`
+24. Click `Yes` on the NuGet popup and the untrusted repository popup
+25.
