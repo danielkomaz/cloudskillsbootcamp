@@ -54,7 +54,7 @@ resource "azurerm_key_vault" "kv" {
 }
 
 resource "azurerm_virtual_network" "vnet" {
-  name                = "${azurerm_resource_group.rg.name}-network"
+  name                = "${azurerm_resource_group.rg.name}-vnet"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -68,7 +68,7 @@ resource "azurerm_subnet" "subnet" {
 }
 
 resource "azurerm_network_security_group" "nsg" {
-  name                = "acceptanceTestSecurityGroup1"
+  name                = "${var.vm.name}-nsg"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -85,13 +85,8 @@ resource "azurerm_network_security_group" "nsg" {
   }
 }
 
-resource "azurerm_subnet_network_security_group_association" "subnsg" {
-  subnet_id                 = azurerm_subnet.subnet.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
-}
-
 resource "azurerm_public_ip" "pubip" {
-  name                = "acceptanceTestPublicIp1"
+  name                = "${var.vm.name}-ip"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   allocation_method   = "Dynamic"
@@ -134,7 +129,7 @@ resource "azurerm_windows_virtual_machine" "vm" {
   source_image_reference {
     publisher = "MicrosoftWindowsServer"
     offer     = "WindowsServer"
-    sku       = "2016-Datacenter"
+    sku       = "2019-Datacenter"
     version   = "latest"
   }
 

@@ -176,4 +176,14 @@ After deploying the infrastructure follow these steps:
 22. Open Powershell ISE by clicking on `Start` -> click `Windows Powershell ISE`
 23. Run command: `Install-Module AZ`
 24. Click `Yes` on the NuGet popup and the untrusted repository popup
-25.
+25. Use the hotkey `Ctrl+R`to open the `Script Pane`
+26. Run the following script:
+
+    ```Powershell
+    Add-AzAccount -identity
+    $password = Get-AzKeyVaultSecret -VaultName <YOUR_VAULT_NAME> -Name <YOUR_SECRET_NAME>
+    $password
+    $password.SecretValue
+    ```
+
+    _Note:_ The last two commands of the script will first output all methods and properties of the secret object and second the actual password property of the secret, which is usually be used ins scripts.
