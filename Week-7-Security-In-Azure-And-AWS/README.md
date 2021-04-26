@@ -140,6 +140,8 @@ If you click on one such vulnerbility you can see a discription about the issue 
 | --------- | ------------------- | ------------------------- |
 | Terraform | Chocolatey          | `choco install terraform` |
 
+### Create Infrastructure with Terraform
+
 For this Project we need to prepare the following Azure infrastructure:
 
 - VM with Windows Server 2019 Datacenter and public IP
@@ -162,6 +164,8 @@ vm = {
     public_dns_name = "<GLOBAL_UNIQUE_VAULT_NAME>"
 }
 ```
+
+### Generate and use Secret in VM
 
 After deploying the infrastructure follow these steps:
 
@@ -216,6 +220,8 @@ After deploying the infrastructure follow these steps:
 | Name    | Installation Method | Install Command                              |
 | ------- | ------------------- | -------------------------------------------- |
 | AWS-CLI | Download & Install  | [Download here](https://aws.amazon.com/cli/) |
+
+### Manage IAM with AWS CLI
 
 This one is rather easy so I will try to split up the used commands and give a bit of an explanation.
 
@@ -272,4 +278,53 @@ aws iam get-policy --policy-arn <value>
 
 # add a policy to a group
 aws iam attach-group-policy --group-name Daniels-Group --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
+```
+
+## Project 5 - Creating RBAC rules and Azure Policies
+
+### Software (Azure RBAC)
+
+| Name                     | Installation Method           | Install Command                                         |
+| ------------------------ | ----------------------------- | ------------------------------------------------------- |
+| Powershell-core (PS 7.1) | Chocolatey                    | `choco install powershell-core`                         |
+| PS-Module Az             | PowerShell (Module Installer) | `Install-Module -Name Az -AllowClobber -Scope AllUsers` |
+
+### Azure RBAC
+
+Create an RBAC which is scoped to your Subscription
+
+```Powershell
+$subscription = "subscriptions/<YOUR_SUBSCRIPTION_ID>"
+az ad sp create-for-rbac -n "AzureDevOps" --role Contributor --scope $subscription
+```
+
+The following command will create the same RBAC as above but with more option to be used in programming
+
+```Powershell
+$subscription = "/subscriptions/<YOUR_SUBSCRIPTION_ID>"
+az ad sp create-for-rbac -n "AzureDevOps" --role Contributor --scope $subscription --sdk-auth
+```
+
+Create a group in Azure Active Directory
+
+```Powershell
+$GroupName = "TestGroup"
+az ad group create --display-name $GroupName --mail-nickname $GroupName
+```
+
+## Azure Policy
+
+Get a list of description names and names of all policies available in Azure
+
+```Powershell
+az policy definition list --query '[].{DN:displayName, name:name}'
+```
+
+Create a resource policy assignment with a system assigned identity
+
+```Powershell
+$resourceGroup = "/subscriptions/<YOUR_SUBSCRIPTION_ID>/resourceGroups/<YOUR_RG_NAME>"
+$policyName = "<DISPLAYNAME_OF_THE_ASSIGNED_POLICY>"
+$assignmentName = "<NAME_OF_YOUR_ASSIGNMENT>"
+az policy assignment create --name $assignmentName --displayName $assignmentName --policy $policyName --scope $resourceGroup
 ```
