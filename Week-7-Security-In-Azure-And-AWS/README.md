@@ -134,6 +134,12 @@ If you click on one such vulnerbility you can see a discription about the issue 
 
 ## Project 3 - Security Authentication in Code
 
+### Software (Azure Vault)
+
+| Name      | Installation Method | Install Command           |
+| --------- | ------------------- | ------------------------- |
+| Terraform | Chocolatey          | `choco install terraform` |
+
 For this Project we need to prepare the following Azure infrastructure:
 
 - VM with Windows Server 2019 Datacenter and public IP
@@ -141,6 +147,21 @@ For this Project we need to prepare the following Azure infrastructure:
 - Azure Key Vault
 
 The directory `Project-3\Terraform` provides you with a terraform module to povide all these with a single `terraform apply`.
+
+Use the following template for your terraform.tfvars:
+
+```hcl
+resource_group_name = "keyvault-rg"
+azure_region = "westeurope"
+vault_name = "keyvault"
+vm = {
+    name = "kvtest1",
+    size = "Standard_B1s",
+    admin_username = "adminuser",
+    admin_password = "WeAretesting!2021",
+    public_dns_name = "<GLOBAL_UNIQUE_VAULT_NAME>"
+}
+```
 
 After deploying the infrastructure follow these steps:
 
@@ -187,3 +208,68 @@ After deploying the infrastructure follow these steps:
     ```
 
     _Note:_ The last two commands of the script will first output all methods and properties of the secret object and second the actual password property of the secret, which is usually be used ins scripts.
+
+## Project 4 - Creating IAM roles users and groups
+
+### Software (AWS IAM)
+
+| Name    | Installation Method | Install Command                              |
+| ------- | ------------------- | -------------------------------------------- |
+| AWS-CLI | Download & Install  | [Download here](https://aws.amazon.com/cli/) |
+
+This one is rather easy so I will try to split up the used commands and give a bit of an explanation.
+
+This command will create a user within the AWS IAM (Identity and Access Management)
+
+```Powershell
+aws iam create-user --user-name Daniel
+```
+
+With the following command you can create a group in AWS IAM
+
+```Powershell
+aws iam create-group --group-name Daniels-Group
+```
+
+With this command you can join the user to the group
+
+```Powershell
+aws iam add-user-to-group --user-name Daniel --group-name Daniels-Group
+```
+
+The following commands will help you to find your way around permissions in AWS:
+
+```Powershell
+# list infos about all user's
+aws iam list-users
+
+# get current user's infos
+aws iam get-user
+
+# get specific user's infos
+aws iam get-user --user-name Daniel
+
+# delete one user
+aws iam delete-user --user-name Daniel
+
+# list current user's access keys
+aws iam list-access-keys
+
+# list infos about all policies
+aws iam list-roles
+
+# list the names of all roles
+aws iam list-roles --query 'Roles[*].RoleName'
+
+# list infos about all policies
+aws iam list-policies
+
+# list names of all policies (unsorted)
+aws iam list-policies --query 'Policies[*].PolicyName'
+
+# get infos about a specific policy
+aws iam get-policy --policy-arn <value>
+
+# add a policy to a group
+aws iam attach-group-policy --group-name Daniels-Group --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
+```
