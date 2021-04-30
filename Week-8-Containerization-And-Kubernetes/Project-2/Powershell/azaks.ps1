@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
 
-    $name = 'cloudskillsaks21',
+    $name = 'devaks21',
     $location = 'westeurope',
     $rgName = 'AKS',
     $nodeCount = 1,
