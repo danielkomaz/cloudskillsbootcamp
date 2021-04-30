@@ -81,7 +81,7 @@ With that all you need to do is run the script from the `Powershell` directory.
 | Terraform | Chocolatey          | `choco install terraform`      |
 | K8s CLI   | Chocolatey          | `choco install kubernetes-cli` |
 
-##### Create Cluster (Terraform)
+##### Create AKS Cluster (Terraform)
 
 To create the same AKS cluster with terraform just run the following commands from the Terraform directory (no tfvars is needed):
 
@@ -117,6 +117,15 @@ kubectl get pods -A
 kubectl get namespace
 ```
 
+#### Destroy AKS Cluster (Terraform)
+
+Always remember to destroy your deployments after you finished testing everything to keep your costs low.
+Destroy your terraform deployment with the following command:
+
+```Powershell
+terraform destroy
+```
+
 ### Project 3 - Deploying to AKS
 
 #### Software (Deploy to AKS)
@@ -147,3 +156,30 @@ kubectl get service
 ```
 
 ### Project 4 - Creating an EKS cluster
+
+#### Software (Create EKS with Terraform)
+
+| Name                     | Installation Method | Install Command                 |
+| ------------------------ | ------------------- | ------------------------------- |
+| Powershell-core (PS 7.1) | Chocolatey          | `choco install powershell-core` |
+| AWS-CLI                  | Chocolatey          | `choco install awscli`          |
+| K8s CLI                  | Chocolatey          | `choco install kubernetes-cli`  |
+
+#### Create EKS
+
+To create the EKS cluster with terraform just run the following commands from the Terraform directory (no tfvars is needed):
+
+```Powershell
+terraform init
+terraform plan -out=plan
+terraform apply plan
+```
+
+#### Destroy EKS Cluster (Terraform)
+
+Always remember to destroy your deployments after you finished testing everything to keep your costs low.
+Destroy your terraform deployment with the following command:
+
+```Powershell
+terraform destroy
+```
