@@ -121,9 +121,29 @@ kubectl get namespace
 
 #### Software (Deploy to AKS)
 
-| Name      | Installation Method | Install Command                |
-| --------- | ------------------- | ------------------------------ |
-| Terraform | Chocolatey          | `choco install terraform`      |
-| K8s CLI   | Chocolatey          | `choco install kubernetes-cli` |
+| Name    | Installation Method | Install Command                |
+| ------- | ------------------- | ------------------------------ |
+| K8s CLI | Chocolatey          | `choco install kubernetes-cli` |
 
-####
+#### Deploy to AKS
+
+To deploy our nginx pod including the added service run the following command:
+
+```Powershell
+kubectl apply -f nginx.yml
+```
+
+Check your deployment with the following command:
+
+```Powershell
+kubectl get deployments
+```
+
+With the following command you can get infrmations about your deployed services.
+If you copy the `EXTERNAL-IP` of the `nginx-service` into your browser you should be able to see the default page of nginx.
+
+```Powershell
+kubectl get service
+```
+
+### Project 4 - Creating an EKS cluster
