@@ -12,7 +12,7 @@ _Note:_ If you are looking for a good and handy GUI/IDE for administrating/devel
 
 ### Create Deployment
 
-After instaling minikube you should be able to to run one of the following command from the Project-1 directory to start the deployment:
+After instaling minikube you should be able to to run one of the following commands from the Week 8 root directory to start the deployment:
 
 ```Powershell
 kubectl create -f nginx.yml
@@ -90,7 +90,7 @@ terraform init
 terraform plan -out=plan ; terraform apply plan
 ```
 
-### Get Cluster Credentials
+### Get Cluster Credentials (AKS)
 
 With our cluster running use the following command to get the k8s-config which is needed for you to run commands against it.
 
@@ -98,7 +98,7 @@ With our cluster running use the following command to get the k8s-config which i
 az aks get-credentials --name devaks21 --resource-group AKS
 ```
 
-### Test Cluster Connection
+### Test Cluster Connection (AKS)
 
 Run at least one of the following commands to test your connection and get some information about your cluster.
 
@@ -163,7 +163,6 @@ kubectl get service
 | ------------------------ | ------------------- | ------------------------------- |
 | Powershell-core (PS 7.1) | Chocolatey          | `choco install powershell-core` |
 | AWS-CLI                  | Chocolatey          | `choco install awscli`          |
-| K8s CLI                  | Chocolatey          | `choco install kubernetes-cli`  |
 
 ### Create EKS
 
@@ -182,4 +181,62 @@ Destroy your terraform deployment with the following command:
 
 ```Powershell
 terraform destroy
+```
+
+## Project 5 - Deploying to EKS
+
+### Software (Deploy to EKS)
+
+| Name                     | Installation Method | Install Command                 |
+| ------------------------ | ------------------- | ------------------------------- |
+| Powershell-core (PS 7.1) | Chocolatey          | `choco install powershell-core` |
+| AWS-CLI                  | Chocolatey          | `choco install awscli`          |
+| K8s CLI                  | Chocolatey          | `choco install kubernetes-cli`  |
+
+### Get Cluster Credentials (EKS)
+
+With our cluster running use the following command to get the k8s-config which is needed for you to run commands against it.
+
+```Powershell
+az aks get-credentials --name devaks21 --resource-group AKS
+```
+
+### Test Cluster Connection (EKS)
+
+Run at least one of the following commands to test your connection and get some information about your cluster.
+
+```Powershell
+# List all nodes in cluster
+kubectl get nodes
+```
+
+```Powershell
+# List all pods in cluster
+kubectl get pods -A
+```
+
+```Powershell
+# List all namespaces in cluster
+kubectl get namespace
+```
+
+### Deploy to EKS
+
+To deploy our nginx pod including the added service run the following command again from the Week 8 root directory:
+
+```Powershell
+kubectl apply -f nginx.yml
+```
+
+Check your deployment with the following command:
+
+```Powershell
+kubectl get deployments
+```
+
+With the following command you can get infrmations about your deployed services.
+If you copy the `EXTERNAL-IP` of the `nginx-service` into your browser you should be able to see the default page of nginx.
+
+```Powershell
+kubectl get service
 ```
