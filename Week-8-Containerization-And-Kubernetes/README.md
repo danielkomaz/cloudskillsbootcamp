@@ -1,8 +1,13 @@
 # Week 8 - Containerization and Kubernetes
 
+This week we will take a close look on how to run containers in Azure and AWS.
+Based on the workflow showed in the Cloud Native Bootcamp videos I created an alternative way in which we deploy all our workload with terraform.
+
 _Note:_ If you are looking for a good and handy GUI/IDE for administrating/developing on k8s clusters you should have a look at [Lens](https://k8slens.dev/).
 
 ## Project 1 - Creating a Minikube environment
+
+In this project we will create a local Minikube installation which can be used for local development.
 
 ### Software (Minikube)
 
@@ -54,8 +59,10 @@ And since you need Docker anyways on Windows to run your containers, we can also
 
 ## Project 2 - Creating an AKS Cluster
 
-There are several ways to create an AKS cluster.
-In this repo I show you two of them.
+This project will show you two ways of how to create an AKS cluster.
+
+1. Via Powershell script using the AZ module
+2. Using terraform
 
 ### Create AKS with Powershell
 
@@ -128,6 +135,8 @@ terraform destroy
 
 ## Project 3 - Deploying to AKS
 
+Based on the previous project we will deploy a demo workload to the AKS cluster.
+
 ### Software (Deploy to AKS)
 
 | Name    | Installation Method | Install Command                |
@@ -157,12 +166,14 @@ kubectl get service
 
 ## Project 4 - Creating an EKS cluster
 
+Similar to project 2 we create an EKS cluster on AWS.
+This time with terraform only.
+
 ### Software (Create EKS with Terraform)
 
-| Name                     | Installation Method | Install Command                 |
-| ------------------------ | ------------------- | ------------------------------- |
-| Powershell-core (PS 7.1) | Chocolatey          | `choco install powershell-core` |
-| AWS-CLI                  | Chocolatey          | `choco install awscli`          |
+| Name      | Installation Method | Install Command           |
+| --------- | ------------------- | ------------------------- |
+| Terraform | Chocolatey          | `choco install terraform` |
 
 ### Create EKS
 
@@ -184,6 +195,9 @@ terraform destroy
 ```
 
 ## Project 5 - Deploying to EKS
+
+In this project we will see how deploy the same workload of project 3 to our EKS cluster.
+As you will see only the step of how to get the credentials for connecting to the cluster is different.
 
 ### Software (Deploy to EKS)
 
@@ -239,4 +253,33 @@ If you copy the `EXTERNAL-IP` of the `nginx-service` into your browser you shoul
 
 ```Powershell
 kubectl get service
+```
+
+## Project 6 - Using Azure ACI
+
+In this project we will deploy a single container to Azure Container Instance (ACI) without the need to run a complete kubertnetes cluster.
+
+### Software (ACI)
+
+| Name      | Installation Method | Install Command           |
+| --------- | ------------------- | ------------------------- |
+| Terraform | Chocolatey          | `choco install terraform` |
+
+### Deploy to ACI
+
+With only the provided terraform module and the following commands, we can deploy a demo-app to ACI.
+
+```Powershell
+terraform init
+terraform plan -out=plan
+terraform apply plan
+```
+
+### Destroy ACI Deployment
+
+Always remember to destroy your deployments after you finished testing everything to keep your costs low.
+Destroy your terraform deployment with the following command:
+
+```Powershell
+terraform destroy
 ```
