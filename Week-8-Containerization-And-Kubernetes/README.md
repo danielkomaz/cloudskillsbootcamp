@@ -52,14 +52,14 @@ And since you need Docker anyways on Windows to run your containers, we can also
 | Docker Desktop | Chocolatey          | `choco install docker-desktop` |
 | K8s CLI        | Chocolatey          | `choco install kubernetes-cli` |
 
-### Project 2 - Creating an AKS Cluster
+## Project 2 - Creating an AKS Cluster
 
 There are several ways to create an AKS cluster.
 In this repo I show you two of them.
 
-#### Create AKS with Powershell
+### Create AKS with Powershell
 
-##### Software (Create AKS with Powershell)
+#### Software (Create AKS with Powershell)
 
 | Name                     | Installation Method           | Install Command                                         |
 | ------------------------ | ----------------------------- | ------------------------------------------------------- |
@@ -67,21 +67,21 @@ In this repo I show you two of them.
 | PS-Module Az             | PowerShell (Module Installer) | `Install-Module -Name Az -AllowClobber -Scope AllUsers` |
 | K8s CLI                  | Chocolatey                    | `choco install kubernetes-cli`                          |
 
-##### Create Cluster (Powershell)
+#### Create Cluster (Powershell)
 
 I extended the script provided by cloudskills to also create the resource group.
 With that all you need to do is run the script from the `Powershell` directory.
 
-#### Create AKS with Terraform
+### Create AKS with Terraform
 
-##### Software (Create AKS with Terraform)
+#### Software (Create AKS with Terraform)
 
 | Name      | Installation Method | Install Command                |
 | --------- | ------------------- | ------------------------------ |
 | Terraform | Chocolatey          | `choco install terraform`      |
 | K8s CLI   | Chocolatey          | `choco install kubernetes-cli` |
 
-##### Create AKS Cluster (Terraform)
+#### Create AKS Cluster (Terraform)
 
 To create the same AKS cluster with terraform just run the following commands from the Terraform directory (no tfvars is needed):
 
@@ -90,7 +90,7 @@ terraform init
 terraform plan -out=plan ; terraform apply plan
 ```
 
-#### Get Cluster Credentials
+### Get Cluster Credentials
 
 With our cluster running use the following command to get the k8s-config which is needed for you to run commands against it.
 
@@ -98,7 +98,7 @@ With our cluster running use the following command to get the k8s-config which i
 az aks get-credentials --name devaks21 --resource-group AKS
 ```
 
-#### Test Cluster Connection
+### Test Cluster Connection
 
 Run at least one of the following commands to test your connection and get some information about your cluster.
 
@@ -117,7 +117,7 @@ kubectl get pods -A
 kubectl get namespace
 ```
 
-#### Destroy AKS Cluster (Terraform)
+### Destroy AKS Cluster (Terraform)
 
 Always remember to destroy your deployments after you finished testing everything to keep your costs low.
 Destroy your terraform deployment with the following command:
@@ -126,15 +126,15 @@ Destroy your terraform deployment with the following command:
 terraform destroy
 ```
 
-### Project 3 - Deploying to AKS
+## Project 3 - Deploying to AKS
 
-#### Software (Deploy to AKS)
+### Software (Deploy to AKS)
 
 | Name    | Installation Method | Install Command                |
 | ------- | ------------------- | ------------------------------ |
 | K8s CLI | Chocolatey          | `choco install kubernetes-cli` |
 
-#### Deploy to AKS
+### Deploy to AKS
 
 To deploy our nginx pod including the added service run the following command:
 
@@ -155,9 +155,9 @@ If you copy the `EXTERNAL-IP` of the `nginx-service` into your browser you shoul
 kubectl get service
 ```
 
-### Project 4 - Creating an EKS cluster
+## Project 4 - Creating an EKS cluster
 
-#### Software (Create EKS with Terraform)
+### Software (Create EKS with Terraform)
 
 | Name                     | Installation Method | Install Command                 |
 | ------------------------ | ------------------- | ------------------------------- |
@@ -165,7 +165,7 @@ kubectl get service
 | AWS-CLI                  | Chocolatey          | `choco install awscli`          |
 | K8s CLI                  | Chocolatey          | `choco install kubernetes-cli`  |
 
-#### Create EKS
+### Create EKS
 
 To create the EKS cluster with terraform just run the following commands from the Terraform directory (no tfvars is needed):
 
@@ -175,7 +175,7 @@ terraform plan -out=plan
 terraform apply plan
 ```
 
-#### Destroy EKS Cluster (Terraform)
+### Destroy EKS Cluster (Terraform)
 
 Always remember to destroy your deployments after you finished testing everything to keep your costs low.
 Destroy your terraform deployment with the following command:
