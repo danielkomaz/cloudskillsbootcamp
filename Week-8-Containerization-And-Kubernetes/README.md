@@ -275,6 +275,12 @@ terraform plan -out=plan
 terraform apply plan
 ```
 
+### Check Deployment (ACI)
+
+To see your deployed container "in action" go to the Azure portal and search for `ACI` and the click on `Container Instances`.
+Select your container group and click on `Container`.
+There you should be able to see the new container running.
+
 ### Destroy ACI Deployment
 
 Always remember to destroy your deployments after you finished testing everything to keep your costs low.
@@ -283,3 +289,5 @@ Destroy your terraform deployment with the following command:
 ```Powershell
 terraform destroy
 ```
+
+## Project 7 - Using AWS Fargate
