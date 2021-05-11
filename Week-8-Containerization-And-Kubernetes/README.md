@@ -291,3 +291,45 @@ terraform destroy
 ```
 
 ## Project 7 - Using AWS Fargate
+
+For this project I also used terraform to provide the whole infrastructure including the deployed container.  
+Kudos to [Oxalide](https://github.com/Oxalide) which provided the [terraform-fargate-example](https://github.com/Oxalide/terraform-fargate-example), which I based the whole deployment on. the only changes that I made were to remove Vault as store for AWS credentials and also updated the code to modern terraform variable calls without "${var}" syntax.
+
+### Software (AWS Fargate)
+
+| Name      | Installation Method | Install Command           |
+| --------- | ------------------- | ------------------------- |
+| Terraform | Chocolatey          | `choco install terraform` |
+
+### Set variables (AWS Fargate)
+
+To use the provided terraform module you need to save the following code as `terraform.tfvars` and enter all infos to be able to deploy to your account:
+
+```hcl
+aws_access_key = "<YOUR-AWS-ACCESS-KEY>"
+aws_secret_key = "<YOUR-AWS-SECRET-KEY>"
+aws_account_id = "<YOUR-AWS-ACCOUNT-ID>"
+aws_region     = "eu-west-1"
+app_image      = "nginx:latest"
+app_port       = 80
+app_count      = 1
+```
+
+### Deploy Fargate and Container
+
+With only the provided terraform module and the following commands, we can deploy a demo-app to Fargate.
+
+```Powershell
+terraform init
+terraform plan -out=plan
+terraform apply plan
+```
+
+### Destroy Fargate Deployment
+
+Always remember to destroy your deployments after you finished testing everything to keep your costs low.
+Destroy your terraform deployment with the following command:
+
+```Powershell
+terraform destroy
+```

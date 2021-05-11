@@ -1,219 +1,205 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-  }
-}
+# Specify the provider and access details
 
-# Configure the AWS Provider
 provider "aws" {
-  region = var.region
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
+  region     = var.aws_region
 }
 
-# Configure Roles for Cluster and NodeGroup
-resource "aws_iam_role" "eks_role" {
-  name = var.roleName
+### Network
 
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "eks.amazonaws.com"
-        }
-      },
-    ]
-  })
+# Fetch AZs in the current region
+data "aws_availability_zones" "available" {}
+
+resource "aws_vpc" "main" {
+  cidr_block = "172.17.0.0/16"
 }
 
-# Get IAM Policies
-data "aws_iam_policy" "eks_policy" {
-  name = "AmazonEKSClusterPolicy"
-}
-
-# Attach IAM policies to roles
-resource "aws_iam_role_policy_attachment" "eks_attach" {
-  role       = aws_iam_role.eks_role.name
-  policy_arn = data.aws_iam_policy.eks_policy.arn
-}
-
-# Get VPC and Subnets
-data "aws_vpc" "vpc" {
-  default = true
-}
-
-data "aws_subnet_ids" "subnets" {
-  vpc_id = data.aws_vpc.vpc.id
-}
-
-data "aws_subnet" "subnet_ids" {
-  count = length(data.aws_subnet_ids.subnets.ids)
-  id    = tolist(data.aws_subnet_ids.subnets.ids)[count.index]
-}
-
-# Create EKS Cluster
-resource "aws_eks_cluster" "eks_cluster" {
-  name     = var.clusterName
-  role_arn = aws_iam_role.eks_role.arn
-
-  vpc_config {
-    subnet_ids = data.aws_subnet.subnet_ids.*.id
-  }
-
-  # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
-  # Otherwise, EKS will not be able to properly delete EKS managed EC2 infrastructure such as Security Groups.
-  depends_on = [
-    aws_iam_role_policy_attachment.eks_attach,
-    aws_subnet.private
-  ]
-}
-
-resource "aws_vpc_ipv4_cidr_block_association" "secondary_cidr" {
-  vpc_id     = data.aws_vpc.vpc.id
-  cidr_block = "172.16.0.0/24"
-}
-
+# Create var.az_count private subnets, each in a different AZ
 resource "aws_subnet" "private" {
-  vpc_id                   = aws_vpc_ipv4_cidr_block_association.secondary_cidr.vpc_id
-  cidr_block               = "172.16.0.0/25"
-  
+  count             = var.az_count
+  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  vpc_id            = aws_vpc.main.id
 }
 
+# Create var.az_count public subnets, each in a different AZ
+resource "aws_subnet" "public" {
+  count                   = var.az_count
+  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, var.az_count + count.index)
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  vpc_id                  = aws_vpc.main.id
+  map_public_ip_on_launch = true
+}
+
+# IGW for the public subnet
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.main.id
+}
+
+# Route the public subnet traffic through the IGW
+resource "aws_route" "internet_access" {
+  route_table_id         = aws_vpc.main.main_route_table_id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.gw.id
+}
+
+# Create a NAT gateway with an EIP for each private subnet to get internet connectivity
+resource "aws_eip" "gw" {
+  count      = var.az_count
+  vpc        = true
+  depends_on = [aws_internet_gateway.gw]
+}
+
+resource "aws_nat_gateway" "gw" {
+  count         = var.az_count
+  subnet_id     = element(aws_subnet.public.*.id, count.index)
+  allocation_id = element(aws_eip.gw.*.id, count.index)
+}
+
+# Create a new route table for the private subnets
+# And make it route non-local traffic through the NAT gateway to the internet
 resource "aws_route_table" "private" {
-  vpc_id = data.aws_vpc.vpc.id
+  count  = var.az_count
+  vpc_id = aws_vpc.main.id
 
-  route = []
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = element(aws_nat_gateway.gw.*.id, count.index)
+  }
 }
 
+# Explicitely associate the newly created route tables to the private subnets (so they don't default to the main route table)
 resource "aws_route_table_association" "private" {
-  subnet_id      = aws_subnet.private.id
-  route_table_id = aws_route_table.private.id
+  count          = var.az_count
+  subnet_id      = element(aws_subnet.private.*.id, count.index)
+  route_table_id = element(aws_route_table.private.*.id, count.index)
 }
 
-resource "aws_iam_role" "eks_fargate_role" {
-  name                  = "${var.clusterName}-fargate_cluster_role"
-  description           = "Allow fargate cluster to allocate resources for running pods"
-  force_detach_policies = true
-  assume_role_policy    = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": [
-          "eks.amazonaws.com",
-          "eks-fargate-pods.amazonaws.com"
-          ]
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-POLICY
-}
+### Security
 
-resource "aws_iam_role_policy_attachment" "AmazonEKSFargatePodExecutionRolePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
-  role       = aws_iam_role.eks_fargate_role.name
-}
+# ALB Security group
+# This is the group you need to edit if you want to restrict access to your application
+resource "aws_security_group" "lb" {
+  name        = "tf-ecs-alb"
+  description = "controls access to the ALB"
+  vpc_id      = aws_vpc.main.id
 
-resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.eks_fargate_role.name
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEKSVPCResourceController" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
-  role       = aws_iam_role.eks_fargate_role.name
-}
-
-resource "aws_eks_fargate_profile" "eks_fargate" {
-  cluster_name           = aws_eks_cluster.eks_cluster.name
-  fargate_profile_name   = "${var.clusterName}-fargate-profile"
-  pod_execution_role_arn = aws_iam_role.eks_fargate_role.arn
-  subnet_ids             = [aws_subnet.private.id]
-
-  selector {
-    namespace = "cludskills-eks"
+  ingress {
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  timeouts {
-    create = "30m"
-    delete = "30m"
+  egress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "fargate_role"
+# Traffic to the ECS Cluster should only come from the ALB
+resource "aws_security_group" "ecs_tasks" {
+  name        = "tf-ecs-tasks"
+  description = "allow inbound access from the ALB only"
+  vpc_id      = aws_vpc.main.id
 
-  assume_role_policy = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "ecs-tasks.amazonaws.com"
-     },
-     "Effect": "Allow",
-     "Sid": ""
-   }
- ]
-}
-EOF
-}
-resource "aws_iam_role" "ecs_task_role" {
-  name = "fargate_task"
+  ingress {
+    protocol        = "tcp"
+    from_port       = var.app_port
+    to_port         = var.app_port
+    security_groups = [aws_security_group.lb.id]
+  }
 
-  assume_role_policy = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "ecs-tasks.amazonaws.com"
-     },
-     "Effect": "Allow",
-     "Sid": ""
-   }
- ]
-}
-EOF
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
-resource "aws_iam_role_policy_attachment" "ecs-task-execution-role-policy-attachment" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-resource "aws_iam_role_policy_attachment" "task_s3" {
-  role       = aws_iam_role.ecs_task_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+### ALB
+
+resource "aws_alb" "main" {
+  name            = "tf-ecs-chat"
+  subnets         = aws_subnet.public.*.id
+  security_groups = [aws_security_group.lb.id]
 }
 
-resource "aws_ecs_task_definition" "definition" {
-  family                   = "task_definition_name"
-  task_role_arn            = aws_iam_role.ecs_task_role.arn
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+resource "aws_alb_target_group" "app" {
+  name        = "tf-ecs-chat"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip"
+}
+
+# Redirect all traffic from the ALB to the target group
+resource "aws_alb_listener" "front_end" {
+  load_balancer_arn = aws_alb.main.id
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    target_group_arn = aws_alb_target_group.app.id
+    type             = "forward"
+  }
+}
+
+### ECS
+
+resource "aws_ecs_cluster" "main" {
+  name = "tf-ecs-cluster"
+}
+
+resource "aws_ecs_task_definition" "app" {
+  family                   = "app"
   network_mode             = "awsvpc"
-  cpu                      = "256"
-  memory                   = "1024"
   requires_compatibilities = ["FARGATE"]
+  cpu                      = var.fargate_cpu
+  memory                   = var.fargate_memory
 
   container_definitions = <<DEFINITION
 [
   {
-    "image": "nginx:latest",
-    "name": "project-container"
+    "cpu": ${var.fargate_cpu},
+    "image": "${var.app_image}",
+    "memory": ${var.fargate_memory},
+    "name": "app",
+    "networkMode": "awsvpc",
+    "portMappings": [
+      {
+        "containerPort": ${var.app_port},
+        "hostPort": ${var.app_port}
+      }
+    ]
   }
 ]
 DEFINITION
+}
+
+resource "aws_ecs_service" "main" {
+  name            = "tf-ecs-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.app.arn
+  desired_count   = var.app_count
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    security_groups = [aws_security_group.ecs_tasks.id]
+    subnets         = aws_subnet.private.*.id
+  }
+
+  load_balancer {
+    target_group_arn = aws_alb_target_group.app.id
+    container_name   = "app"
+    container_port   = var.app_port
+  }
+
+  depends_on = [
+    aws_alb_listener.front_end
+  ]
 }
