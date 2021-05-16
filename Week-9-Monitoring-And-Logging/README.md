@@ -54,4 +54,70 @@ This setting is mostly meant for troubleshooting purposes and requires a storage
 It will install the DependencyAgentWindows which you can seen in the panel `Extensions` of the vm.
 The diagnostic settings, once enabled, will give you the ability to setup crash dumps for sepcific processes, Performance counters and also capture logs.
 
-## Project 2 - Monitoring Serverless Platforms
+## Project 2 - Monitoring Serverless Platforms (AWS)
+
+### Create Lambda Function
+
+To create a Lambda function follow these steps:
+
+1. Search for `Lambda` in the searchbar
+2. Click on `Create function`
+3. Select `Browse serverless app repository`
+4. Search for and click on `alexa-skills-kit-color-expert-python`
+5. Provide a TopicName like e.g.: `color`
+6. Click on `Deploy`
+
+### Create Lambda Monitoring Test
+
+1. Go back to the Lambda Service screen
+2. On the left sidebar click on `Functions`
+3. Click on your new function
+4. Scroll down and click on the down-arrow next to `Test`
+5. Click on `Configure test event`
+6. Select the Event template `Amazon Alexa Intent MyColorIs`
+7. Provide a name for the test
+8. Click on `Save`
+9. Click a few times on `Test` to produce some log entries
+10. Open the tab `Monitor` and take a look at the metrics and logs
+
+### Setup Dashboard for Lambda functions
+
+1. In the `Monitor - Metrics` view click on `Add to dashboard`
+2. Click on `Create new`
+3. Provide a name for your dashboard
+4. Click on the small checkmark next to the textbox
+5. Click on `Add to dashboard`
+
+### Setup Alerts (AWS)
+
+1. In the `Dashboard` view on the left sidebar select `Alarms`
+2. Click on `Create alarm`
+3. Click on `Select metric`
+4. Scroll down and select the following metric: `Lambda` -> `By Function Name` -> your new function with metric name `Errors`
+5. Click on `Select metric`
+6. Change statistic to `Sum`
+7. Change period to `1 minute`
+8. Define threshold with `3`
+9. Click on `Next`
+10. On `Notification` select `Create new topic`
+11. Enter your email-address to `Email endpoints`
+12. Click on `Create topic`
+13. Scroll down and click on `Next`
+14. Set a name for your alarm
+15. Click on `Next`
+16. Scroll down and click on `Create alarm`
+17. Check your emailaccount and confirm the subscription to your alarm
+18. Go back to the alerts view and refresh, your alarm should now no longer be pending
+
+### Test Lambda Alert
+
+1. Go back to your Lambda function screen
+2. Scroll down and click on the down-arrow next to `Test`
+3. Click on `Configure test event`
+4. Select `Create new test event`
+5. Select the Event template `Amazon Alexa Intent MyColorIs` or your previously made test
+6. Provide a name for the test
+7. On line 38 change `MyColorIsIntent` to `MyBadTest`
+8. Click on `Save`
+9. Click a few times (at least 3) on `Test` to produce an alert
+10. Check your emailaccount where you should find an alert email
