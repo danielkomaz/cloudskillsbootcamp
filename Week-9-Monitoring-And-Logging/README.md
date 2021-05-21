@@ -122,7 +122,7 @@ To create a Lambda function follow these steps:
 9. Click a few times (at least 3) on `Test` to produce an alert
 10. Check your emailaccount where you should find an alert email
 
-## Project 3 Azure Monitor and Alerting
+## Project 3 - Azure Monitor and Alerting
 
 In this lab we will set an alert on vm level which will email us and also set an automatic action if it is triggered. Also we will configure an alert on the forecated costs of our Azure Subscription including email notification.
 
@@ -209,3 +209,23 @@ With this we will set an alert which will warn us if our forecasted monthly bill
 12. Keep action group to `None`
 13. Enter your email address into `Alert recipients (email)`
 14. Click on `Create`
+
+## Project 4 - Azure Logging and Metrics
+
+For this lab we need the deployment of [Week 8 - Project 6](https://github.com/danielkomaz/cloudskillsbootcamp/tree/main/Week-8-Containerization-And-Kubernetes#project-6---using-azure-aci).  
+Here we will go through some basic usages of the ACI metrics.
+
+### View ACI Metrics
+
+1. In the [Azure Portal](http://portal.azure.com/), search for `container` and select `Container instances` from the results
+2. Open your Container Instance
+3. Click on `Metrics` in the left pane
+4. Select Metric `Memory Usage`
+5. On the right side click on `Local Time` and select `30 Minutes`
+
+### View ACI Logs
+
+In the metrics view of the ACI click on `Drill into Logs` -> `Activity Logs`.  
+Here you can see all logs connected to your Container Instance.
+
+Take some time and look around the Metrics and logs until you get a good understanding on what it can do for you when you need it.
