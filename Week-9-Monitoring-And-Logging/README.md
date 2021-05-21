@@ -121,3 +121,91 @@ To create a Lambda function follow these steps:
 8. Click on `Save`
 9. Click a few times (at least 3) on `Test` to produce an alert
 10. Check your emailaccount where you should find an alert email
+
+## Project 3 Azure Monitor and Alerting
+
+In this lab we will set an alert on vm level which will email us and also set an automatic action if it is triggered. Also we will configure an alert on the forecated costs of our Azure Subscription including email notification.
+
+### High CPU Alert
+
+In the [Azure Portal](http://portal.azure.com/) we will create an alert which will monitor the CPU usage of our VM and will send us an email if it is triggered.  
+This lab will depend on the [deployment of the VM in Project 1](#-Project-1---Monitoring-Azure-IaaS).
+
+1. Search for `Monitor` and click on `Monitor` in the results
+2. In the left pane click on `Virtual Machines`and see that the VM is managed by Azure Monitor
+
+#### Create Automatic Action
+
+1. In the left pane click on `Alerts`
+2. Click on `Manage actions`
+3. Click on `New action group`
+4. Select or create a new resource group
+5. Name your action group
+6. The display name will be entered automatically but you might change it if you want
+7. Click on `Next: Notifications`
+8. Choose notification type `Email/SMS message/Push/Voice`
+9. Check `Email` in the right pane and enter your email address
+10. Click on `OK`
+11. Set a name for your notification
+12. Click on `Next: Actions`
+13. Choose Action type `Automation Runbook`
+14. Choose Runbook Action `Stop VM`
+15. Select your Subscription
+16. Click on `Automation Account` to crea a new automation account for your subscription
+17. Name your automation account
+18. Select a resource group or create a new one
+19. Click on `OK`
+20. Click `OK` again
+21. Provide a name for your Runbook
+22. Click on `Review + Create`
+23. Review your settings and click on `Create`
+
+#### Create Alert Rule
+
+1. Go back to the Monitor resource screen
+2. Click on `Alerts` in the left pane
+3. Click on `New Alert Rule`
+4. Click on `Select Resource`
+5. Filter the list with `Virtual machines`
+6. Select your deployed VM
+7. Click on `Done`
+8. Click on `Add condition`
+9. Search for `CPU` and select `Percentage CPU`
+10. Leave the chart period, scroll down and set the threshold value to `3`
+11. Click `Done`
+12. Click on `Add action group`
+13. Select your previously created action group
+14. Click on `Select`
+15. Provide a name for your alert rule
+16. Switch Severity to `2 - Warning`
+17. Make sure `Enable alert rule upon creation` is checked
+18. Click on `Create alert rule`
+
+#### Trigger Alert Rule
+
+1. In the Azure Portal search for `vm` and click on `Virtual machines` in the results
+2. Open your monitored VM
+3. In the left pane scroll down and select `Run command`
+4. Click on `RunPowerShellScript`
+5. Enter the following command and click `Run`:
+   `Install-Module az -force`
+6. After some time return to the `Overview` and you will see that the VM has been turned off.
+
+### Cost Alert
+
+With this we will set an alert which will warn us if our forecasted monthly bill would outgrow our set budget.
+
+1. Open the [Azure Portal](http://portal.azure.com/), search for `cost` and select `Cost Management + Billing` from the results
+2. In the left pane click on `Cost Management`
+3. In the left pane click on `Cost alerts`
+4. Click on `Add`
+5. Make sure the Scope is correctly set to your Subscription
+6. Provide a name for your Budget
+7. Keep `Reset Period` on `Billing Month`
+8. Set the limit of you buget that should not be outgrown
+9. Scroll down and click on `Next`
+10. Select Alert condition `Forecast`
+11. Enter `100` into % of budget
+12. Keep action group to `None`
+13. Enter your email address into `Alert recipients (email)`
+14. Click on `Create`
