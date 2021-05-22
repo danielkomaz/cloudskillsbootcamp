@@ -228,4 +228,41 @@ Here we will go through some basic usages of the ACI metrics.
 In the metrics view of the ACI click on `Drill into Logs` -> `Activity Logs`.  
 Here you can see all logs connected to your Container Instance.
 
-Take some time and look around the Metrics and logs until you get a good understanding on what it can do for you when you need it.
+_Note:_ Take some time and look around the Metrics and logs until you get a good understanding on what it can do for you when you need it.
+
+## Project 5 - AWS CloudWatch
+
+In this lab we will take a look on what Cloudwatch can do for us in terms of displaying metrics and alerts for EC2 instances.
+
+### Deploy EC2 Instance With Monitoring Enabled
+
+1. Open the [AWS portal](https://aws.amazon.com/)
+2. Search for `EC2` and select it from the results
+3. Click on `Launch instance`
+4. Use the `Amazon Linux 2 AMI (HVM), SSD Volume Type` or any other free tier eligable image and click `Select`
+5. Keep `t2.micro` selected
+6. Click on `Next: Configure Instance Details`
+7. Select a network for your EC2 instance (you can also leave it to default)
+8. Scroll down and check `Enable CloudWatch detailed monitoring`
+9. Click on `Next: Add Storage`
+10. Keep everything default an click on `Next: Add Tags`
+11. (Optional) Add some tags
+12. Click on `Next: Configure Security Group`
+13. Create a security group or select an existing one to prevent the whole world to access your EC2 instance
+14. Click on `Review and Launch`
+15. After the instance has successfully been launched open it in the portal
+16. In the Overview of your instance click on `Monitoring`
+
+Here you can check the basic monitoring metrics provided by EC2 instances.
+
+### Enable Detailed Monitoring
+
+1. In the `Monitoring` tab of your EC2 instance click on `Manage detailed monitoring`
+2. Make sure `Enable` is checked
+3. Click on `Save`
+4. Search for `CloudWatch` in the searchbar and click on it in the results
+5. Scroll down in the Services table and click on `EC2`
+
+In this view you are able to see detailed information abaout all your monitoring enabled EC2 instances.  
+If you click on `Service dashboard` you are able to also check your Alarms.  
+You should definitely get familar with these dashboards as they will be good tools for basic performance monitoring if you should start using AWS.
