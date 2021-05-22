@@ -266,3 +266,99 @@ Here you can check the basic monitoring metrics provided by EC2 instances.
 In this view you are able to see detailed information abaout all your monitoring enabled EC2 instances.  
 If you click on `Service dashboard` you are able to also check your Alarms.  
 You should definitely get familar with these dashboards as they will be good tools for basic performance monitoring if you should start using AWS.
+
+## Project 6 - Container Monitoring With Prometheus
+
+In this lab we will setup Prometheus and Grafana as our monitoring solution within an AKS cluster.  
+On how to create and test connection to an AKS Cluster please check [Week 8 - Project 2](https://github.com/danielkomaz/cloudskillsbootcamp/tree/main/Week-8-Containerization-And-Kubernetes#project-2---creating-an-aks-cluster).
+
+### Software Requirements
+
+| Name                     | Installation Method           | Install Command                                         |
+| ------------------------ | ----------------------------- | ------------------------------------------------------- |
+| Powershell-core (PS 7.1) | Chocolatey                    | `choco install powershell-core`                         |
+| PS-Module Az             | PowerShell (Module Installer) | `Install-Module -Name Az -AllowClobber -Scope AllUsers` |
+| K8s CLI                  | Chocolatey                    | `choco install kubernetes-cli`                          |
+| Helm CLI                 | Chocolatey                    | `choco install kubernetes-helm`                         |
+
+### Deploy Promethues And Grafana
+
+#### Create Namespace
+
+To create the namespace we will install our monitoring tools use the following commands:
+
+```kubectl
+kubectl create namespace monitoring
+```
+
+#### Add Helm Repo
+
+Use the following commands to install the helm chart:
+
+```helm
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+```
+
+#### Install Helm Chart
+
+```helm
+helm install prometheus -n monitoring prometheus-community/kube-prometheus-stack
+```
+
+#### Check Pods and Services
+
+Get all pods in our namespace:
+
+```kubectl
+kubectl --namespace monitoring get pods
+```
+
+Get all services in our namespace:
+
+```kubectl
+kubectl --namespace monitoring get services
+```
+
+#### Make Services Available By Portforwarding
+
+Make Prometheus service available:
+_Note:_ For this to work your user needs admin rights on your machine as it will open a local port:
+
+```kubectl
+kubectl port-forward -n monitoring service/prometheus-kube-prometheus-prometheus 3000:9090
+```
+
+Open http://localhost:3000 to view your Prometheus website.
+
+_Note:_ I used port 3000 on my localhost because 9090 would not work because of other projects I run. Feel free to change it to anything that works for you.  
+User `Ctrl + C` to cancel the portforwarding.
+
+#### Grafana
+
+1. Make grafana available by using the following command:
+
+   ```kubectl
+   kubectl port-forward -n monitoring service/prometheus-grafana 90:80
+   ```
+
+2. Access grafana by accessing http://localhost:3000
+3. Enter the following credentials:
+   Username: admin
+   Password: prom-operator
+4. Click on `Dashboards -> Manage`
+
+Here you can switch between established dashboards.
+Some notable dashboards:
+`Kubernetes\Compute Resources\Cluster`
+`Kubernetes\Compute Resources\Workload`
+
+Within the dashboards you can also switch between namespaces.
+
+`Dashboards -> Playlists` enables you to create a list of dashboards which are switched automatically after some time, ideal to display them on some central TV screen.
+
+You should explore your grafana instance and play around with it as it can do some great things.
+
+_Note:_ Our deployment does not persist any data, so any dashboards you create will be lost when destorying the deployment. Check the [helm chart documentation](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) for information on how to add persistent volumes.
+
+_Final Note:_ Do not forget to destory all resources in your Azure and AWS accounts to not produce unnecessary costs.
